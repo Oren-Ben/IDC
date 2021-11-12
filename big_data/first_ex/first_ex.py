@@ -180,51 +180,39 @@ middle = get_size_csv_file(mydata_csv) // 2
 
 
 def first_chunk(file_csv, middle):
-    line_count = 0
     f1 = open(file_csv, 'rb')
     f1.seek(0)
     d1 = f1.read(middle).decode(encoding='utf-8')
-    rows = d1.splitlines(True)
-    if rows[-2][-1] == "\n":
-        print(True)
-        
-    # for line in rows:
-    #     if line != "\n":
-    #         line_count +=1
-    # print(line_count)
+    rows = d1.splitlines()
     return len(rows)
 
 
 def last_chunk(file_csv, middle):
-    line_count = 0
     f2 = open(file_csv, 'rb')
     f2.seek(middle + 1, 0)
     d2 = f2.read().decode(encoding='utf-8')
-    rows = d2.split('\n')
-    for line in rows:
-        if line != "\n":
-            line_count +=1
-    print(line_count)
+    rows = d2.splitlines()
     return len(rows)
 
 
 # Q3.3
 
-#sum_of_rows = first_chunk(mydata_csv, middle) + last_chunk(mydata_csv, middle)
+sum_of_rows = first_chunk(mydata_csv, middle) + last_chunk(mydata_csv, middle)
 
 
-#In section 2.1, the number of lines is 10,000,000.
-#In this section, we received 10,000,002.
-#Two reasons cause the difference between those results:
-#The table's header is counted in the first chunk function.
-#The middle row is divided into two. It is therefore counted once as a regular row and in the last chunk as a supplement.
+# In section 2.1, the number of lines is 10,000,000.
+# In this section, we received 10,000,002.
+# Two reasons cause the difference between those results:
+# The table's header is counted in the first chunk function.
+# The middle row is divided into two. It is therefore counted
+# once as a regular row and in the last chunk as a supplement.
 
 
 # Q3.4
 
-def split_to_chunks (file_csv, chunk_len):
-    bt_rows=0 #st_chunk
-    counter = [] #res
+def split_to_chunks(file_csv, chunk_len):
+    bt_rows = 0  # st_chunk
+    counter = []  # res
     csv_len = get_size_csv_file(file_csv)
     f1 = open(file_csv, 'rb')
     while bt_rows < csv_len:
@@ -232,31 +220,12 @@ def split_to_chunks (file_csv, chunk_len):
         d1 = f1.read(chunk_len).decode(encoding='utf-8')
         rows_batch = d1.splitlines()
         bt_rows += chunk_len
-
         if bt_rows < csv_len:
             bt_rows -= len(rows_batch.pop(-1))
-        
-        #if rows_batch[-1][-1] != '\n':
-        #    bt_rows-=len(rows_batch.pop(-1))
-        
+
         counter.append(len(rows_batch))
     return counter
-    
-    # for i in range(num_of_chunks):
-    #     ind = f1.tell()
-    #     f1.seek(ind+1)
-    #     d1 = f1.read(chunk_len+ind*i).decode(encoding='utf-8')
-    #     rows_batch = d1.splitlines()
-    #     rows += rows_batch
-    #
-    #
-    # if csv_len % num_of_chunks >0:
-    #     ind = f1.tell()
-    #     f1.seek(ind)
-    #     d1 = f1.read(csv_len).decode(encoding='utf-8')
-    #     rows_batch = d1.splitlines()
-    #     rows += rows_batch
-    #
+
 
 if __name__ == "__main__":
     data = create_csv(cols, num_of_rows)

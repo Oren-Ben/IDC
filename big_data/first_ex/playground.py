@@ -50,13 +50,14 @@ conn = create_connection('mydata.db')
 
 # get_size_csv_file(mydata_csv)
 
-
 #print(first_chunk(mydata_csv, middle))
 
 #print("-----------")
 
+print(sum_of_rows)
+print("-----------")
 #print(last_chunk(mydata_csv, middle))
-print(split_to_chunks(mydata_csv,16000000))
+print(split_to_chunks(mydata_csv,1600000))
 
 
 #print(mg16_chunks())
