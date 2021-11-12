@@ -12,7 +12,7 @@ from sqlite3 import Error
 import csv
 import os
 
-mydata_csv = 'mydata.csv'
+
 
 
 # Q1.1
@@ -27,7 +27,6 @@ def create_csv(cols_name, num_of_rows):
     return df.to_csv('mydata.csv', index=False)
 
 
-# , header=False
 
 num_of_rows = 10000000
 cols = ['id', 'fruit', 'price', 'color']
@@ -136,33 +135,31 @@ def read_csv_with_pyarrow(file_csv):
     df_pa = pa_csv.read_csv(file_csv)
     return df_pa
 
-
-# ,read_options= pa_csv.ReadOptions(column_names=cols)
-
 def count_rows(df_pa):
     return df_pa.num_rows
 
 
+# Q2.2
 def crete_parquet_with_pyarrow(file_csv):
     table = read_csv_with_pyarrow(file_csv)
     pq.write_table(table, 'mydatapyarrow.parquet')
 
 
-# Q2.2
+# Q2.3
 
 def crete_parquet_with_dask(file_csv):
     df = dd.read_csv(file_csv)
     df.to_parquet('mydatadask.parquet')
 
 
-# Q2.3
+# Q2.4
 
 def crete_parquet_with_pandas(file_csv):
     df = pd.read_csv(file_csv)
     df.to_parquet('mydatapandas.parquet')
 
 
-# Q2.4
+# Q2.5
 # PyArrow and pandas store data in a columnar method.
 # Apache Arrow takes advantage of a columnar buffer to reduce IO and accelerate analytical processing performance.
 # Dask is a library for parallel computation,
@@ -176,7 +173,7 @@ def get_size_csv_file(file_csv):
     return file_size
 
 
-middle = get_size_csv_file(mydata_csv) // 2
+
 
 
 def first_chunk(file_csv, middle):
@@ -196,9 +193,6 @@ def last_chunk(file_csv, middle):
 
 
 # Q3.3
-
-sum_of_rows = first_chunk(mydata_csv, middle) + last_chunk(mydata_csv, middle)
-
 
 # In section 2.1, the number of lines is 10,000,000.
 # In this section, we received 10,000,002.
@@ -228,5 +222,54 @@ def split_to_chunks(file_csv, chunk_len):
 
 
 if __name__ == "__main__":
-    data = create_csv(cols, num_of_rows)
-    conn = create_connection("mydata.db")
+    
+    MYDATA_CSV = 'mydata.csv'
+    MYDATA_DB = 'mydata.db'
+    
+    # Intro -
+    data = create_csv(cols,num_of_rows)
+    
+    # Q1.1
+    conn = create_connection(MYDATA_DB)
+    create_table(conn, create_table_query)
+    
+    # Q1.2
+    insert_rows(conn,MYDATA_CSV)
+    my_data = retrieve_data(conn, select_all_query)
+    
+    # Q1.3
+    apples_above_90 = retrieve_data(conn,select_all_apples_with_price_above_90)
+    blue_oranges = retrieve_data(conn,select_all_blue_oranges)
+    
+    # Q.2.1
+    df_pa = read_csv_with_pyarrow(MYDATA_CSV)
+    print(count_rows(df_pa))
+    
+    # Q 2.2
+    crete_parquet_with_pyarrow(MYDATA_CSV)
+    pa_parquet = pd.read_parquet('mydatapyarrow.parquet')
+
+    # Q 2.3
+    crete_parquet_with_dask(MYDATA_CSV)
+    dd_parquet = dd.read_parquet('mydatadask.parquet')
+
+    # Q 2.4
+    crete_parquet_with_pandas(MYDATA_CSV)
+    df_parquet = pd.read_parquet('mydatapandas.parquet')
+    
+    # Q3.1
+    get_size_csv_file(MYDATA_CSV)
+    middle = get_size_csv_file(MYDATA_CSV) // 2
+
+
+    # Q3.2
+    print(first_chunk(MYDATA_CSV, middle))
+    print(last_chunk(MYDATA_CSV, middle))
+    
+    sum_of_rows = first_chunk(MYDATA_CSV, middle) + last_chunk(MYDATA_CSV, middle)
+    print(sum_of_rows)
+    
+    # Q3.4
+    print(split_to_chunks(MYDATA_CSV, middle)) # problem need to fix!!
+    print(split_to_chunks(MYDATA_CSV, 16000000))
+
