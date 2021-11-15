@@ -1,19 +1,19 @@
 Oren_id = 204079453
 Yuval_id = 205714447
 
-import sqlite3
-import dask.dataframe as dd
-import pandas as pd
-import pyarrow as pa
-import pyarrow.csv as pa_csv
-import pyarrow.parquet as pq
-import numpy as np
-from sqlite3 import Error
 import csv
 import os
+import sqlite3
+from sqlite3 import Error
+
+import dask.dataframe as dd
+import numpy as np
+import pandas as pd
+import pyarrow.csv as pa_csv
+import pyarrow.parquet as pq
 
 
-
+# In general, all our print commands, will appear at the bottom of the page.
 
 # Q1.1
 def create_csv(cols_name, num_of_rows):
@@ -27,7 +27,6 @@ def create_csv(cols_name, num_of_rows):
     return df.to_csv('mydata.csv', index=False)
 
 
-
 num_of_rows = 10000000
 cols = ['id', 'fruit', 'price', 'color']
 fruit_choice = ['Orange', 'Grape', 'Apple', 'Banana', 'Pineapple', 'Avocado']
@@ -35,9 +34,6 @@ color_choice = ['Red', 'Green', 'Yellow', 'Blue']
 
 
 def create_connection(db_data):
-    """ create a database connection to a database that resides
-        in the memory
-    """
     conn = None
     try:
         conn = sqlite3.connect(db_data)
@@ -48,7 +44,6 @@ def create_connection(db_data):
 
 
 # Q1.2
-# Table Definition
 create_table_query = '''CREATE TABLE IF NOT EXISTS mydata(
                 id integer PRIMARY KEY,
                 fruit text,
@@ -58,11 +53,6 @@ create_table_query = '''CREATE TABLE IF NOT EXISTS mydata(
 
 
 def create_table(conn, create_table_query):
-    """ create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param create_table_sql: a CREATE TABLE statement
-    :return:
-    """
     try:
         c = conn.cursor()
         c.execute(create_table_query)
@@ -79,13 +69,11 @@ def insert_rows(conn, file_name):
         # Opening the mydata-records.csv file
         file = open(file_name)
         # Reading the contents of the
-        # mydata-records.csv file
         contents = csv.reader(file)
         next(contents, None)
         insert_records = records_query
         
         # SQL query to insert data into the
-        # mydata table
         # Importing the contents of the file
         # into our mydata table
         c.executemany(insert_records, contents)
@@ -114,11 +102,6 @@ def retrieve_data(conn, select_query):
         print(e)
 
 
-def print_rows(data):
-    for i in data:
-        print(i)
-
-
 # Q1.3
 
 # The query retrieve the rows that meet the criteria of fruit is Apple and price above 90
@@ -135,6 +118,7 @@ def read_csv_with_pyarrow(file_csv):
     df_pa = pa_csv.read_csv(file_csv)
     return df_pa
 
+
 def count_rows(df_pa):
     return df_pa.num_rows
 
@@ -146,14 +130,12 @@ def crete_parquet_with_pyarrow(file_csv):
 
 
 # Q2.3
-
 def crete_parquet_with_dask(file_csv):
     df = dd.read_csv(file_csv)
     df.to_parquet('mydatadask.parquet')
 
 
 # Q2.4
-
 def crete_parquet_with_pandas(file_csv):
     df = pd.read_csv(file_csv)
     df.to_parquet('mydatapandas.parquet')
@@ -163,17 +145,15 @@ def crete_parquet_with_pandas(file_csv):
 # PyArrow and pandas store data in a columnar method.
 # Apache Arrow takes advantage of a columnar buffer to reduce IO and accelerate analytical processing performance.
 # Dask is a library for parallel computation,
-# Dask DataFrame is split up into many Pandas DataFrames that sometimes call “partitions
+# Dask DataFrame is split up into many Pandas DataFrames that sometimes call “partitions"
 # to scale it to multi-core machines and distributed clusters.
 
 # Q3.1
-def get_size_csv_file(file_csv):
+def get_size_csv_file(file_csv, print_cond=False):
     file_size = os.path.getsize(file_csv)
-    print("File Size is :", file_size, "bytes")
+    if not print_cond:
+        print(f"File Size is :{file_size} bytes")
     return file_size
-
-
-
 
 
 def first_chunk(file_csv, middle):
@@ -194,82 +174,98 @@ def last_chunk(file_csv, middle):
 
 # Q3.3
 
-# In section 2.1, the number of lines is 10,000,000.
+# In section 2.1, the number of lines is 10,000,000 +1header = 10,000,001 (including the header line).
 # In this section, we received 10,000,002.
-# Two reasons cause the difference between those results:
-# The table's header is counted in the first chunk function.
-# The middle row is divided into two. It is therefore counted
+# The reason that cause the difference between those results:
+# Is the middle row, it is divided into two, therefore counted
 # once as a regular row and in the last chunk as a supplement.
 
 
 # Q3.4
 
-def split_to_chunks(file_csv, chunk_len):
-    bt_rows = 0  # st_chunk
-    counter = []  # res
-    csv_len = get_size_csv_file(file_csv)
-    f1 = open(file_csv, 'rb')
-    while bt_rows < csv_len:
-        f1.seek(bt_rows)
-        d1 = f1.read(chunk_len).decode(encoding='utf-8')
-        rows_batch = d1.splitlines()
-        bt_rows += chunk_len
-        if bt_rows < csv_len:
-            bt_rows -= len(rows_batch.pop(-1))
+# We will first solve the original question,
+# splitting into the first and last chunk based on the middle file size
+# without "adding" another row
 
-        counter.append(len(rows_batch))
-    return counter
+def first_chunk_update(file_name, size_of_chunk):
+    with open(file_name, 'rb') as file:
+        return len(file.readlines(size_of_chunk))
+
+
+def last_chunk_update(file_name, size_of_chunk):
+    with open(file_name, 'rb') as file:
+        file.seek(size_of_chunk + 1, 0)
+        return len(file.readlines()[1:])
+
+
+# Following this, we will suggest another solution to split the data into chunks based on chunk size.
+
+def read_chunk(file_name, start, size_of_chunk):
+    with open(file_name, 'rb') as file:
+        file.seek(start + 1, 0)
+        return len(file.readlines(size_of_chunk)[1:])
+
+
+def algo(file_name, chunk_size):
+    file_size = get_size_csv_file(file_name, print_cond=True)
+    rows_counter = []
+    rows_counter.append(first_chunk_update(file_name, chunk_size))
+    for byte in range(chunk_size, file_size, chunk_size):
+        rows_counter.append(read_chunk(file_name, byte, chunk_size))
+    return rows_counter
 
 
 if __name__ == "__main__":
-    
     MYDATA_CSV = 'mydata.csv'
     MYDATA_DB = 'mydata.db'
     
     # Intro -
-    data = create_csv(cols,num_of_rows)
+    data = create_csv(cols, num_of_rows)
     
-    # Q1.1
+    # # Q1.1
     conn = create_connection(MYDATA_DB)
     create_table(conn, create_table_query)
-    
+
     # Q1.2
-    insert_rows(conn,MYDATA_CSV)
+    insert_rows(conn, MYDATA_CSV)
     my_data = retrieve_data(conn, select_all_query)
     
     # Q1.3
-    apples_above_90 = retrieve_data(conn,select_all_apples_with_price_above_90)
-    blue_oranges = retrieve_data(conn,select_all_blue_oranges)
+    apples_above_90 = retrieve_data(conn, select_all_apples_with_price_above_90)
+    print(apples_above_90)
+    blue_oranges = retrieve_data(conn, select_all_blue_oranges)
+    print(blue_oranges)
     
-    # Q.2.1
+    # Q2.1
     df_pa = read_csv_with_pyarrow(MYDATA_CSV)
     print(count_rows(df_pa))
     
-    # Q 2.2
+    # Q2.2
     crete_parquet_with_pyarrow(MYDATA_CSV)
     pa_parquet = pd.read_parquet('mydatapyarrow.parquet')
-
-    # Q 2.3
+    
+    # Q2.3
     crete_parquet_with_dask(MYDATA_CSV)
     dd_parquet = dd.read_parquet('mydatadask.parquet')
-
-    # Q 2.4
+    
+    # Q2.4
     crete_parquet_with_pandas(MYDATA_CSV)
     df_parquet = pd.read_parquet('mydatapandas.parquet')
     
     # Q3.1
     get_size_csv_file(MYDATA_CSV)
-    middle = get_size_csv_file(MYDATA_CSV) // 2
-
-
+    middle = get_size_csv_file(MYDATA_CSV, print_cond=True) // 2
+    
     # Q3.2
     print(first_chunk(MYDATA_CSV, middle))
     print(last_chunk(MYDATA_CSV, middle))
     
+    # Summing the total rows:
     sum_of_rows = first_chunk(MYDATA_CSV, middle) + last_chunk(MYDATA_CSV, middle)
     print(sum_of_rows)
     
-    # Q3.4
-    print(split_to_chunks(MYDATA_CSV, middle)) # problem need to fix!!
-    print(split_to_chunks(MYDATA_CSV, 16000000))
-
+    # Q3.5
+    # Checking the first_chunk and last_chunk new algo:
+    print(first_chunk_update(MYDATA_CSV, middle) + last_chunk_update(MYDATA_CSV, middle))
+    # Checking the suggested algo on 16MB chunks:
+    print(algo(MYDATA_CSV, 16000000))
