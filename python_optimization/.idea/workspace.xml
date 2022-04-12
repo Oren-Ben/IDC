@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3248c4cc-57b2-4efc-96ef-e1ed5cd72371" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../machine_learning/hw2/.ipynb_checkpoints/hw2_204079453_205714447-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../machine_learning/hw2/.ipynb_checkpoints/hw2_204079453_205714447-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../machine_learning/hw2/hw2_204079453_205714447.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../machine_learning/hw2/hw2_204079453_205714447.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Quad.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code_constration.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/f3_partial.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init - class-UnconstraintLineSearcMin.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/init_cont_unconstraint_min.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plot_2d_level.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/quad_f.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rosenbrock.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solve_f.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/solve_f_cont.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sum_of_exponents.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/termination_cond_f.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_line_search.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_line_search?.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_vs_examples files.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/wolf_step_f.png" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="27hN4H9wEbHfbLjWOElboqZWMvx" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3248c4cc-57b2-4efc-96ef-e1ed5cd72371" name="Changes" comment="" />
+      <created>1649768165378</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1649768165378</updated>
+      <workItem from="1649768168137" duration="2383000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
