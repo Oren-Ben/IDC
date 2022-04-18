@@ -12,31 +12,31 @@ def f_calc(x: np.ndarray, Q: np.ndarray):
 
 
 
-def f_calc_d1(x: np.ndarray, hessian_flag: bool = False):
+def f_calc_d1(x: np.ndarray, eval_hessian: bool = False):
     Q = np.array([[1, 0],
                   [0, 1]])
     f_x = f_calc(x, Q)
     g_x = 2 * Q.dot(x)
-    if hessian_flag:
+    if eval_hessian:
         h_x = 2 * Q
         return f_x, g_x, h_x
     # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
 
 
-def f_calc_d2(x: np.ndarray, hessian_flag: bool = False):
+def f_calc_d2(x: np.ndarray, eval_hessian: bool = False):
     Q = np.array([[1, 0],
                   [0, 100]])
     f_x = f_calc(x, Q)
     g_x = 2 * Q.dot(x)
-    if hessian_flag:
+    if eval_hessian:
         h_x = 2 * Q
         return f_x, g_x, h_x
     # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
 
 
-def f_calc_d3(x: np.ndarray, hessian_flag: bool = False):
+def f_calc_d3(x: np.ndarray, eval_hessian: bool = False):
     q1 = np.array([[np.sqrt(3) / 2, -0.5],
                    [0.5, np.sqrt(3) / 2]]).T
     q2 = np.array([[100, 0],
@@ -46,18 +46,18 @@ def f_calc_d3(x: np.ndarray, hessian_flag: bool = False):
     Q = (q1.dot(q2)).dot(q3)
     f_x = f_calc(x, Q)
     g_x = 2 * Q.dot(x)
-    if hessian_flag:
+    if eval_hessian:
         h_x = 2 * Q
         return f_x, g_x, h_x
     # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
 
 
-def rosenbrock_func(x: np.ndarray, hessian_flag: bool = False):
+def rosenbrock_func(x: np.ndarray, eval_hessian: bool = False):
     f_x = 100.0 * (x[1] - x[0] ** 2) ** 2 + (1 - x[0]) ** 2
     g_x = np.array([-400.0 * x[0] * (x[1] - x[0] ** 2) - 2 * (1 - x[0]),
                     200.0 * (x[1] - x[0] ** 2)])
-    if hessian_flag:
+    if eval_hessian:
         h_x = np.array([[-400.0 * x[1] + 1200 * x[0] ** 2 + 2, -400 * x[0],
                          -400 * x[0], 200]])
         return f_x, g_x, h_x
@@ -72,11 +72,11 @@ def linear_func(x: np.ndarray):
     return f_x, g_x
 
 
-def expo_function(x: np.ndarray, hessian_flag: bool = False):
+def expo_function(x: np.ndarray, eval_hessian: bool = False):
     f_x = np.exp(x[0] + 3 * x[1] - 0.1) + np.exp(x[0] - 3 * x[1] - 0.1) + np.exp(-x[0] - 0.1)
     g_x = np.array([np.exp(x[0] + 3 * x[1] - 0.1) + np.exp(x[0] - 3 * x[1] - 0.1) - np.exp(-x[0] - 0.1),
                     3 * np.exp(x[0] + 3 * x[1] - 0.1) - 3 * np.exp(x[0] - 3 * x[1] - 0.1)])
-    if hessian_flag:
+    if eval_hessian:
         h_x = np.array([[np.exp(x[0] + 3 * x[1] - 0.1) + np.exp(x[0] - 3 * x[1] - 0.1) + np.exp(-x[0] - 0.1),
                          3 * np.exp(x[0] + 3 * x[1] - 0.1) - 3 * np.exp(x[0] - 3 * x[1] - 0.1)],
                         [3 * np.exp(x[0] + 3 * x[1] - 0.1) - 3 * np.exp(x[0] - 3 * x[1] - 0.1),
@@ -86,6 +86,6 @@ def expo_function(x: np.ndarray, hessian_flag: bool = False):
     return f_x, g_x
 
 
-x = np.array([[2, 1],
-              [1, 1]])
-print(linear_func(x)[0])
+# x = np.array([[2, 1],
+#               [1, 1]])
+# print(linear_func(x)[0])
