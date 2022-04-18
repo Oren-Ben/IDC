@@ -18,6 +18,7 @@ def minimization_func(f, x0, step_len, obj_tol, param_tol, max_iter):
         else:
             print("Typo mistake, please try again")
             return -1
+        
 
     x_values = []
     f_values = []
