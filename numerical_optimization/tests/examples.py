@@ -11,6 +11,7 @@ def f_calc(x: np.ndarray, Q: np.ndarray):
     return f_x
 
 
+
 def f_calc_d1(x: np.ndarray, hessian_flag: bool = False):
     Q = np.array([[1, 0],
                   [0, 1]])
