@@ -37,7 +37,13 @@ def minimizer(f, x0,method, step_len, obj_tol, param_tol, max_iter):
     i = 0
     print(i, x_prev, f_prev)
     success = False
-    iteration_report_dict = {i: [x_prev, f_prev]}
+    path_x1_list =[]
+    path_x2_list=[]
+    path_obj_func_list = []
+    iteration_report_dict = {}
+    path_x1_list.append(x_prev[0])
+    path_x2_list.append(x_prev[1])
+    path_obj_func_list.append(f_prev)
     if method == 'GD':
         # x - the points, will change in each iteration until reaches the flag termination.
         # f(x)[1] - will have the gradienet
@@ -48,30 +54,34 @@ def minimizer(f, x0,method, step_len, obj_tol, param_tol, max_iter):
             x_next = x_prev - step_len*g_prev
             f_next, g_next = f(x_next)
             i+=1
-            iteration_report_dict[i]=[x_next,f_next]
+            path_x1_list.append(x_next[0])
+            path_x2_list.append(x_next[1])
+            path_obj_func_list.append(f_next)
             print(i,x_next,f_next)
             success = termination_flag(x_next,x_prev,f_next,f_prev,obj_tol,param_tol)
             print(success)
             if not success:
                 x_prev, f_prev, g_prev = x_next, f_next, g_next
         # Think in the future if we should add it in the return: iteration_report_dict[i],
-        return iteration_report_dict, success
+        return path_x1_list,path_x2_list,path_obj_func_list, success
 
     elif method == 'NT':
         while not success and i <= max_iter:
             #search_dir = -inverse_calculation(h_prev).dot(g_prev)
             search_dir = np.linalg.solve(h_prev,-g_prev)
-            x_next = x_prev - step_len*search_dir
+            x_next = x_prev + step_len*search_dir
             f_next, g_next, h_next = f(x_next, eval_hessian=True)
             i += 1
-            iteration_report_dict[i] = [x_next, f_next]
+            path_x1_list.append(x_next[0])
+            path_x2_list.append(x_next[1])
+            path_obj_func_list.append(f_next)
             print(i, x_next, f_next)
             success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol)
             print(success)
             if not success:
                 x_prev, f_prev, g_prev, h_prev= x_next, f_next, g_next, h_next
 
-        return iteration_report_dict, success
+        return path_x1_list,path_x2_list,path_obj_func_list, success
 
     else:
         print("You inserted wrong number please try again")
@@ -81,6 +91,6 @@ def minimizer(f, x0,method, step_len, obj_tol, param_tol, max_iter):
 x0 = np.array([1,1]).T
 x0_rosenbrock = np.array([-1,2]).T
 #print(x.shape)
-gd_dict, succ = minimizer(rosenbrock_func, x0_rosenbrock,'NT', 'Wolfe', 1e-12, 1e-8, 100)
+path_x1_list,path_x2_list,path_obj_func_list, success= minimizer(rosenbrock_func, x0_rosenbrock,'GD', 'Wolfe', 1e-12, 1e-8, 100)
 
 #print(rosenbrock_func(x0_rosenbrock, True))
