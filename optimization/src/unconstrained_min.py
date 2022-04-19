@@ -69,7 +69,7 @@ def minimizer(f, x0,method, step_len, obj_tol, param_tol, max_iter):
         while not success and i <= max_iter:
             #search_dir = -inverse_calculation(h_prev).dot(g_prev)
             search_dir = np.linalg.solve(h_prev,-g_prev)
-            x_next = x_prev + step_len*search_dir
+            x_next = x_prev- step_len*search_dir
             f_next, g_next, h_next = f(x_next, eval_hessian=True)
             i += 1
             path_x1_list.append(x_next[0])
