@@ -1,3 +1,5 @@
+
+
 import numpy as np
 
 
@@ -65,10 +67,13 @@ def rosenbrock_func(x: np.ndarray, eval_hessian: bool = False):
     return f_x, g_x
 
 
-def linear_func(x: np.ndarray):
+def linear_func(x: np.ndarray, eval_hessian: bool = False ):
     a = np.random.randint(1, 9, x.shape)
     f_x = a.T.dot(x)
     g_x = a.T
+    if eval_hessian:
+        h_x = np.zeros((len(x), len(x)))
+        return f_x, g_x, h_x
     return f_x, g_x
 
 
