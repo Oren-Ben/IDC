@@ -26,23 +26,13 @@ def termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol, g_val=N
     """
     :return: False - continue to search, True - stop searching.
     """
-    diff_param = sum(abs(x_next - x_prev))
+    diff_param = np.linalg.norm(x_next - x_prev)
     diff_obj = abs(f_prev - f_next)
     if g_val is not None and h_val is not None:
         search_dir = np.linalg.solve(h_val, -g_val)
         nt_decrement_cond = 0.5*((search_dir.T.dot(h_val).dot(search_dir))**2)
-        print('diff_param')
-        print(diff_param)
-        print('diff_obj')
-        print(diff_obj)
-        print('nt_decrement_cond')
-        print(nt_decrement_cond)
         return diff_obj < obj_tol or diff_param < param_tol or nt_decrement_cond<obj_tol
     else:
-        print('diff_param')
-        print(diff_param)
-        print('diff_obj')
-        print(diff_obj)
         return diff_obj < obj_tol or diff_param < param_tol
 
 
