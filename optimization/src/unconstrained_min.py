@@ -22,13 +22,28 @@ from tests.examples import *
 # def inverse_calculation(matrix):
 #     return np.linalg.solve(matrix, np.eye(matrix.shape[0]))
 
-def termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol):
+def termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol, g_val=None, h_val=None):
     """
     :return: False - continue to search, True - stop searching.
     """
-    diff_param = np.linalg.norm(x_next - x_prev)
-    diff_obj = f_prev - f_next
-    return diff_obj < obj_tol or diff_param < param_tol
+    diff_param = sum(abs(x_next - x_prev))
+    diff_obj = abs(f_prev - f_next)
+    if g_val is not None and h_val is not None:
+        search_dir = np.linalg.solve(h_val, -g_val)
+        nt_decrement_cond = 0.5*((search_dir.T.dot(h_val).dot(search_dir))**2)
+        print('diff_param')
+        print(diff_param)
+        print('diff_obj')
+        print(diff_obj)
+        print('nt_decrement_cond')
+        print(nt_decrement_cond)
+        return diff_obj < obj_tol or diff_param < param_tol or nt_decrement_cond<obj_tol
+    else:
+        print('diff_param')
+        print(diff_param)
+        print('diff_obj')
+        print(diff_obj)
+        return diff_obj < obj_tol or diff_param < param_tol
 
 
 def wolfe_step_len(x, f, method, f_val, g_val, h_val, wolfe_slope_const=0.01, backtrack_const=0.5):
@@ -54,7 +69,7 @@ def gd_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
             print("Not wolfe")
 
     x_prev = x0
-    f_prev, g_prev = f(x0)
+    f_prev, g_prev = f(x_prev)
     i = 0
     success = False
 
@@ -81,6 +96,7 @@ def gd_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
         if not success:
             x_prev, f_prev, g_prev = x_next, f_next, g_next
     # Think in the future if we should add it in the return: iteration_report_dict[i],
+    print(f"Succes: {success}")
     return path_x1_list, path_x2_list, path_obj_func_list, success
 
 
@@ -113,11 +129,11 @@ def nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
         path_x1_list.append(x_next[0])
         path_x2_list.append(x_next[1])
         path_obj_func_list.append(f_next)
-        success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol)
+        success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol,g_val=g_prev, h_val=h_prev)
         print(f"i={i}, x={x_next}, f(x{i})={f_next}")
         if not success:
             x_prev, f_prev, g_prev, h_prev = x_next, f_next, g_next, h_next
-
+    print(f"Succes: {success}")
     return path_x1_list, path_x2_list, path_obj_func_list, success
 
 
@@ -130,76 +146,6 @@ def minimizer(f, x0, method, step_len, max_iter, obj_tol=1e-12, param_tol=1e-8):
         return nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter)
     else:
         print("You inserted wrong method please try again")
-
-
-
-
-
-    # # Calculate the step len based on wolfe:
-    # if type(step_len) == str:
-    #     if step_len.lower() == 'wolfe':
-    #         if method.lower() =='gd':
-    #             f_val, g_val = f(x0)
-    #             step_len = wolfe_step_len(x0, f, method, f_val=f_val, g_val=g_val, h_val=False)
-    #         elif method.lower() =='nt':
-    #             f_val, g_val, h_val = f(x0, eval_hessian=True)
-    #             step_len = wolfe_step_len(x0, f, method, f_val=f_val, g_val=g_val, h_val=h_val)
-    #         else:
-    #             print("The method is wrong")
-    #
-    # x_prev = x0
-    # f_prev, g_prev, h_prev = f(x0, eval_hessian=True)
-    # i = 0
-    # success = False
-    #
-    # print(i, x_prev, f_prev, success)
-    #
-    # path_x1_list = [x_prev[0]]
-    # path_x2_list = [x_prev[1]]
-    # path_obj_func_list = [f_prev]
-    # iteration_report_dict = {}
-    # if method.lower() == 'gd':
-    #     # x - the points, will change in each iteration until reaches the flag termination.
-    #     # f(x)[1] - will have the gradienet
-    #     # Check if the termination rule exist?
-    #     # report the postion: i, x[i], f[x[i]] (We should save only x[i] and f[x[i]])
-    #     # at the end final location and success/failure.
-    #     while not success and i <= max_iter:
-    #         x_next = x_prev - step_len * g_prev
-    #         f_next, g_next = f(x_next)
-    #         i += 1
-    #         path_x1_list.append(x_next[0])
-    #         path_x2_list.append(x_next[1])
-    #         path_obj_func_list.append(f_next)
-    #         print(i, x_next, f_next)
-    #         success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol)
-    #         print(success)
-    #         if not success:
-    #             x_prev, f_prev, g_prev = x_next, f_next, g_next
-    #     # Think in the future if we should add it in the return: iteration_report_dict[i],
-    #     return path_x1_list, path_x2_list, path_obj_func_list, success
-    #
-    # elif method.lower() == 'nt':
-    #     while not success and i <= max_iter:
-    #         # search_dir = -inverse_calculation(h_prev).dot(g_prev)
-    #         search_dir = np.linalg.solve(h_prev, -g_prev)
-    #         x_next = x_prev + step_len * search_dir
-    #         f_next, g_next, h_next = f(x_next, eval_hessian=True)
-    #         i += 1
-    #         path_x1_list.append(x_next[0])
-    #         path_x2_list.append(x_next[1])
-    #         path_obj_func_list.append(f_next)
-    #         print(i, x_next, f_next)
-    #         success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol)
-    #         print(success)
-    #         if not success:
-    #             x_prev, f_prev, g_prev, h_prev = x_next, f_next, g_next, h_next
-    #
-    #     return path_x1_list, path_x2_list, path_obj_func_list, success
-    #
-    # else:
-    #     print("You inserted wrong method please try again")
-
 
 
 if __name__ == '__main__':

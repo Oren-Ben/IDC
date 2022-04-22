@@ -22,13 +22,7 @@ class TestUnconstrained(unittest.TestCase):
         x1_list = [s[0] for s in results_list]
         x2_list = [s[1] for s in results_list]
         object_list = [s[2] for s in results_list]
+        plot_contour_lines(f, methods, title, x1_list, x2_list, max_iter)
         plot_func_value_vs_iter_num(object_list, methods, title)
 
-    #print(np.arange(len(object_list[0])))
-
-
-#     def test_f1(self):
-#         x0_rosenbrock = np.array([-1, 2]).T
-#         result = src.unconstrained_min.minimizer(rosenbrock_func, x0_rosenbrock,'GD', 'Wolfe', 1e-12, 1e-8, 100)
-#
 unittest.main()
