@@ -111,3 +111,4 @@ def minimizer(f, x0, method, step_len, max_iter, obj_tol=1e-12, param_tol=1e-8):
     else:
         print("You inserted wrong method please try again")
 
+

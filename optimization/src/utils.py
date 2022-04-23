@@ -40,6 +40,7 @@ def plot_contour_lines(f, methods,title, x1_list, x2_list,func_val_list,
     plt.show()
 
 
+
 def plot_linear_func_value_vs_iter_num(func_val_list, methods, title):
     plt.plot(np.arange(len(func_val_list)), func_val_list)
     print(methods)
