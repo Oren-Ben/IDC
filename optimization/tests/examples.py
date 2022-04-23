@@ -1,18 +1,8 @@
-
-
 import numpy as np
 
-
 def f_calc(x: np.ndarray, Q: np.ndarray):
-    """
-    :param x:
-    :param Q:
-    :return: the objective function value
-    """
     f_x = x.T.dot(Q).dot(x)
     return f_x
-
-
 
 def f_calc_d1(x: np.ndarray, eval_hessian: bool = False):
     Q = np.array([[1, 0],
@@ -22,7 +12,6 @@ def f_calc_d1(x: np.ndarray, eval_hessian: bool = False):
     if eval_hessian:
         h_x = 2 * Q
         return f_x, g_x, h_x
-    # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
 
 
@@ -34,9 +23,7 @@ def f_calc_d2(x: np.ndarray, eval_hessian: bool = False):
     if eval_hessian:
         h_x = 2 * Q
         return f_x, g_x, h_x
-    # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
-
 
 def f_calc_d3(x: np.ndarray, eval_hessian: bool = False):
     q1 = np.array([[np.sqrt(3) / 2, -0.5],
@@ -51,7 +38,6 @@ def f_calc_d3(x: np.ndarray, eval_hessian: bool = False):
     if eval_hessian:
         h_x = 2 * Q
         return f_x, g_x, h_x
-    # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
 
 
@@ -63,7 +49,6 @@ def rosenbrock_func(x: np.ndarray, eval_hessian: bool = False):
         h_x = np.array([[-400.0 * x[1] + 1200 * x[0] ** 2 + 2,-400 * x[0]], # Check if it is 2-2 or 2+2
                          [-400 * x[0], 200]])
         return f_x, g_x, h_x
-    # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
 
 
@@ -87,10 +72,4 @@ def expo_function(x: np.ndarray, eval_hessian: bool = False):
                         [3 * np.exp(x[0] + 3 * x[1] - 0.1) - 3 * np.exp(x[0] - 3 * x[1] - 0.1),
                          9 * np.exp(x[0] + 3 * x[1] - 0.1) + 9 * np.exp(x[0] - 3 * x[1] - 0.1)]])
         return f_x, g_x, h_x
-    # Note - the returns dont return the same amount of values, check later if it create issues.
     return f_x, g_x
-
-
-# x = np.array([[2, 1],
-#               [1, 1]])
-# print(linear_func(x)[0])

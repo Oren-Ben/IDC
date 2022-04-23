@@ -2,11 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_func_value_vs_iter_num(func_val_list, methods, title):  # ,
+def plot_func_value_vs_iter_num(func_val_list, methods, title):
     plt.plot(np.arange(len(func_val_list[0])), func_val_list[0])
     plt.plot(np.arange(len(func_val_list[1])), func_val_list[1])
     plt.legend(methods)
-    plt.title(title)
+    plt.title(str(title)+ " Function Value VS. Iterations:")
+    plt.xlabel("iterations")
+    plt.ylabel("objective function value")
     plt.show()
 
 
@@ -23,18 +25,27 @@ def plot_contour_lines(f, methods,title, x1_list, x2_list,func_val_list,
     CS = plt.contour(x1_grid, x2_grid, z, 20)
     plt.clabel(CS, inline=True, fontsize=10)
 
-    plt.plot(x1_list[0], x2_list[0], color='blue', linestyle='dashed', marker='o') #, label='gd_path')
-    plt.plot(x1_list[1], x2_list[1], color='orange', linestyle='dashed', marker='o') #label='nt_path')
+    plt.plot(x1_list[0], x2_list[0], color='blue', linestyle='dashed', marker='o')
+    plt.plot(x1_list[1], x2_list[1], color='orange', linestyle='dashed', marker='o')
 
-    plt.plot(x1_list[0][-1], x2_list[0][-1], marker='X' , markerfacecolor='blue', markeredgecolor='black',markersize=12) #, label='gd final x')
-    plt.plot(x1_list[1][-1], x2_list[1][-1] , marker='X' , markerfacecolor='orange', markeredgecolor='black', markersize=12) #, label='nt final x') ,
+    plt.plot(x1_list[0][-1], x2_list[0][-1], marker='X' , markerfacecolor='blue', markeredgecolor='black',markersize=12)
+    plt.plot(x1_list[1][-1], x2_list[1][-1] , marker='X' , markerfacecolor='orange', markeredgecolor='black', markersize=12)
 
 
     plt.xlabel('x1')
     plt.ylabel('x2')
     plt.legend(methods)
     plt.colorbar()
-    plt.title(title)
+    plt.title(str(title)+' Contour Plot')
+    plt.show()
 
+
+def plot_linear_func_value_vs_iter_num(func_val_list, methods, title):
+    plt.plot(np.arange(len(func_val_list)), func_val_list)
+    print(methods)
+    plt.legend([methods])
+    plt.title(str(title)+ " Function Value VS. Iterations:")
+    plt.xlabel("iterations")
+    plt.ylabel("objective function value")
     plt.show()
 
