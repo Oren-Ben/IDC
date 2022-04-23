@@ -65,6 +65,7 @@ def gd_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
 
         success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol)
         if success:
+            print(f"Success: {success}")
             return path_x1_list, path_x2_list, path_obj_func_list, success
         else:
             x_prev, f_prev, g_prev = x_next, f_next, g_next
@@ -108,6 +109,7 @@ def nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
 
         success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol, g_val=g_prev, h_val=h_prev)
         if success:
+            print(f"Success: {success}")
             return path_x1_list, path_x2_list, path_obj_func_list, success
         else:
             x_prev, f_prev, g_prev, h_prev = x_next, f_next, g_next, h_next
