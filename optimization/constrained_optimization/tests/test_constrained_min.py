@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 from src.constrained_min import interior_pt
-from tests.examples import quadratic_func, linear_func
+from tests.examples import qp_func, lp_func
 
 
 # from src.utils import plot_qp, plot_lp
