@@ -16,24 +16,28 @@ def termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol, g_val=N
         return diff_obj < obj_tol or diff_param < param_tol
 
 
-def wolfe_step_len(x, f, method, f_val, g_val, h_val, wolfe_slope_const=0.01, backtrack_const=0.5):
+def wolfe_step_len(x, f, method, f_val, g_val, h_val, t, wolfe_slope_const=0.01, backtrack_const=0.5):
     alpha = 1
     if method.lower() == 'gd':
         pk = -g_val
     elif method.lower() == 'nt':
         pk = np.linalg.solve(h_val, -g_val)
-    while f(x + alpha * pk)[0] > f_val + wolfe_slope_const * alpha * np.matmul(g_val.T, pk):
+    while f(x + alpha * pk, t)[0] > f_val + wolfe_slope_const * alpha * np.matmul(g_val.T, pk):
         alpha *= backtrack_const
     return alpha
 
 
-def minimizer(f, x0, method, step_len, max_iter, obj_tol=1e-12, param_tol=1e-8):
+def minimizer(f, x0, method, step_len, max_iter, t, A, obj_tol=1e-12, param_tol=1e-8):
     if method.lower() == 'gd':
         return gd_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter)
     elif method.lower() == 'nt':
-        return nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter)
+        return nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter, t)
+    elif method.lower() == 'nt_equality':
+        return nt_equality_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter, t, A)
+
     else:
         print("You inserted wrong method please try again")
+
 
 
 def gd_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
@@ -80,45 +84,113 @@ def gd_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
     return path_x1_list, path_x2_list, path_obj_func_list, success
 
 
-def nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter):
+def nt_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter, t):
     if str(step_len).lower() == 'wolfe':
-        f_val, g_val, h_val = f(x0, eval_hessian=True)
-        alpha = wolfe_step_len(x0, f, 'nt', f_val=f_val, g_val=g_val, h_val=h_val)
+        f_val, g_val, h_val = f(x0,t, eval_hessian=True)
+        alpha = wolfe_step_len(x0,f,'nt',f_val,g_val,h_val,t)
     else:
         alpha = step_len
 
     x_prev = x0
-    f_prev, g_prev, h_prev = f(x0, eval_hessian=True)
+    f_prev, g_prev, h_prev = f(x0, t, eval_hessian=True)
     i = 0
     success = False
 
     print(f"i={i}, x={x_prev}, f(x{i})={f_prev}")
 
-    path_x1_list = [x_prev[0]]
-    path_x2_list = [x_prev[1]]
+    path_x_list = [x_prev]
     path_obj_func_list = [f_prev]
 
     while i < max_iter:
         search_dir = np.linalg.solve(h_prev, -g_prev)
         x_next = x_prev + alpha * search_dir
-        f_next, g_next, h_next = f(x_next, eval_hessian=True)
+        f_next, g_next, h_next = f(x_next, t, eval_hessian=True)
         if str(step_len).lower() == 'wolfe':
-            alpha = wolfe_step_len(x_next, f, 'nt', f_val=f_next, g_val=g_next, h_val=h_next)
+            alpha = wolfe_step_len(x_next,f,'nt',f_next,g_next,h_next,t)
+
         else:
             alpha = step_len
 
         success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol, g_val=g_prev, h_val=h_prev)
         if success:
-            print(f"Success: {success}")
-            return path_x1_list, path_x2_list, path_obj_func_list, success
+            # print(f"Success: {success}")
+            return success, x_next, path_obj_func_list, path_x_list
         else:
             x_prev, f_prev, g_prev, h_prev = x_next, f_next, g_next, h_next
 
-        path_x1_list.append(x_prev[0])
-        path_x2_list.append(x_prev[1])
+        path_x_list.append(x_prev)
         path_obj_func_list.append(f_prev)
         i += 1
-        print(f"i={i}, x={x_prev}, f(x{i})={f_prev}")
+        # print(f"i={i}, x={x_prev}, f(x{i})={f_prev}")
 
-    print(f"Success: {success}")
-    return path_x1_list, path_x2_list, path_obj_func_list, success
+    # print(f"Success: {success}")
+
+    #### Remember to verify if this should be x_prev or x_next
+    return success, x_prev, path_obj_func_list, path_x_list
+
+
+def nt_equality_minimizer(f, x0, step_len, obj_tol, param_tol, max_iter, t, A):
+    if str(step_len).lower() == 'wolfe':
+        f_val, g_val, h_val = f(x0,t, eval_hessian=True)
+        alpha = wolfe_step_len(x0,f,'nt',f_val,g_val,h_val,t)
+    else:
+        alpha = step_len
+
+    x_prev = x0
+    f_prev, g_prev, h_prev = f(x0, t, eval_hessian=True)
+    i = 0
+    success = False
+
+    print(f"i={i}, x={x_prev}, f(x{i})={f_prev}")
+
+    path_x_list = [x_prev]
+    path_obj_func_list = [f_prev]
+
+    while i < max_iter:
+        search_dir = calc_search_dir_equality_contst(g_prev, h_prev,A)
+        x_next = x_prev + alpha * search_dir
+        f_next, g_next, h_next = f(x_next, t, eval_hessian=True)
+        if str(step_len).lower() == 'wolfe':
+            alpha = wolfe_step_len(x_next,f,'nt',f_next,g_next,h_next,t)
+        else:
+            alpha = step_len
+
+        success = termination_flag(x_next, x_prev, f_next, f_prev, obj_tol, param_tol, g_val=g_prev, h_val=h_prev)
+        if success:
+            # print(f"Success: {success}")
+            return success, x_next, path_obj_func_list, path_x_list
+        else:
+            x_prev, f_prev, g_prev, h_prev = x_next, f_next, g_next, h_next
+
+        path_x_list.append(x_prev)
+        path_obj_func_list.append(f_prev)
+        i += 1
+        # print(f"i={i}, x={x_prev}, f(x{i})={f_prev}")
+
+        # print(f"Success: {success}")
+
+        #### Remember to verify if this should be x_prev or x_next
+    return success, x_prev, path_obj_func_list, path_x_list
+
+
+def calc_search_dir_equality_contst(g_x, h_x,A):
+    # print('h_x')
+    # print(h_x)
+    # print(h_x.shape)
+    # print("A")
+    # print(A)
+    # print(A.shape)
+    # print(A.T.shape)
+    # print(np.zeros((1, A.shape[0])))
+    # print(np.hstack([h_x, A.T]))
+    # print(np.hstack([A, np.zeros((1, A.shape[0]))]).shape)
+    temp1 = np.vstack([np.hstack([h_x, A.T]),
+                       np.hstack([A, np.zeros((1, A.shape[0]))])])
+    print(temp1.shape)
+    print(np.zeros((1, A.shape[0])).shape)
+    g_x = g_x.reshape((3, 1))
+    temp2 = np.vstack([-g_x, np.zeros((1, A.shape[0]))])
+    print(temp2.shape)
+    result = np.linalg.solve(temp1, temp2)
+    return result[:A.shape[1]]
+

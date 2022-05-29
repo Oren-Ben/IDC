@@ -80,71 +80,75 @@ def expo_function(x: np.ndarray, eval_hessian: bool = False):
 
 ###################### Constrained functions: ###########################
 
-def qp_constrained_func(x: np.ndarray, eval_hessian: bool = False):
-    # x=x0, y=x1, z=x2
-    f_x = x[0] ** 2 + x[1] ** 2 + (x[2] + 1) ** 2
-    g_x = np.array([2 * x[0],
-                    2 * x[1],
-                    2 * x[2] + 2])
-    if eval_hessian:
-        h_x = np.array([2, 0, 0,
-                        0, 2, 0,
-                        0, 0, 2])
-        return f_x, g_x, h_x
-    return f_x, g_x
+def eq_constraints_mat(eval_quad: bool = False):
+    A = None
+    if eval_quad:
+        A = np.array([1, 1, 1]).reshape(1, -1)
+    return A
 
 
-def lp_constrained_func(x: np.ndarray, eval_hessian: bool = False):
-    # x=x0, y=x1
-    f_x = -x[0] - x[1]
-    g_x = np.array([-1, -1])
-    if eval_hessian:
-        h_x = np.zeros((len(x), len(x)))
-        return f_x, g_x, h_x
-    return f_x, g_x
+def eq_constraints_rhs(eval_quad: bool = False):
+    b = None
+    if eval_quad:
+        b = np.array([1])
+    return b
 
 
-class QPFunction():
-
-    def __init__(self):
-        self.A = np.array([1, 1, 1]).reshape(1, -1)
-        self.B = np.array([1])
-
-    def ineq_const(self, x: np.ndarray):
-        return [-x[0],-x[1],-x[2]]
-
-    def qp_func(self, x: np.ndarray, t, eval_hessian: bool = False):
-        # x=x0, y=x1, z=x2
-        f_x = t * (x[0] ** 2 + x[1] ** 2 + (x[2] + 1) ** 2) - np.log(x[0]) - np.log(x[1]) - np.log(x[2])
-        x_deriv = 2 * t * x[0] - 1 / x[0]
-        y_deriv = 2 * t * x[1] - 1 / x[1]
-        z_deriv = 2 * t * (x[2] + 1) - 1 / x[2]
-
-        g_x = np.array([x_deriv, y_deriv, z_deriv])
-        if eval_hessian:
-            h_x = np.diag([2 * t + 1 / ((x[0]) ** 2), 2 * t + 1 / ((x[1]) ** 2), 2 * t + 1 / ((x[2]) ** 2)])
-            return f_x, g_x, h_x
-        return f_x, g_x
-
-
-class LPFunction():
-
-    def __init__(self):
-        self.A = None
-        self.B = None
-
-
-    def ineq_const(self, x: np.ndarray):
+def ineq_const(x: np.ndarray, eval_quad=False):
+    # if it is the quadratic function it will return this constraint:
+    if eval_quad:
+        return [-x[0], -x[1], -x[2]]
+    # if it is the linear function will return those:
+    else:
         return [-x[0] - x[1] + 1, x[1] - 1, x[0] - 2, -x[1]]
 
-    def lp_func(x: np.ndarray, t, eval_hessian: bool = False):
-        # x=x0, y=x1
-        f_x = -t * x[0] - t * x[1] - np.log(x[0] + x[1] - 1) - np.log(1 - x[1]) - np.log(2 - x[0]) - np.log(x[1])
-        x_deriv = -t - 1 / (x[0] + x[1] - 1) + 1 / (2 - x[0])
-        y_deriv = -t - 1 / (x[0] + x[1] - 1) + 1 / (1 - x[1]) - 1 / x[1]
-        g_x = np.array([x_deriv, y_deriv])
-        if eval_hessian:
-            h_x = np.diag([1 / ((2 - x[0]) ** 2), 1 / ((1 - x[1]) ** 2) + 1 / (x[1] ** 2)])
-            h_x += 1 / ((x[0] + x[1] - 1) ** 2)
-            return f_x, g_x, h_x
-        return f_x, g_x
+
+def qp_func(x: np.ndarray, t, eval_hessian: bool = False):
+    # x=x0, y=x1, z=x2
+    f_x = t * (x[0] ** 2 + x[1] ** 2 + (x[2] + 1) ** 2) - np.log(x[0]) - np.log(x[1]) - np.log(x[2])
+    x_deriv = 2 * t * x[0] - 1 / x[0]
+    y_deriv = 2 * t * x[1] - 1 / x[1]
+    z_deriv = 2 * t * (x[2] + 1) - 1 / x[2]
+
+    g_x = np.array([x_deriv, y_deriv, z_deriv])
+    if eval_hessian:
+        h_x = np.diag([2 * t + 1 / ((x[0]) ** 2), 2 * t + 1 / ((x[1]) ** 2), 2 * t + 1 / ((x[2]) ** 2)])
+        return f_x, g_x, h_x
+    return f_x, g_x
+
+
+def lp_func(x: np.ndarray, t, eval_hessian: bool = False):
+    # x=x0, y=x1
+    f_x = -t * x[0] - t * x[1] - np.log(x[0] + x[1] - 1) - np.log(1 - x[1]) - np.log(2 - x[0]) - np.log(x[1])
+    x_deriv = -t - 1 / (x[0] + x[1] - 1) + 1 / (2 - x[0])
+    y_deriv = -t - 1 / (x[0] + x[1] - 1) + 1 / (1 - x[1]) - 1 / x[1]
+    g_x = np.array([x_deriv, y_deriv])
+    if eval_hessian:
+        h_x = np.diag([1 / ((2 - x[0]) ** 2), 1 / ((1 - x[1]) ** 2) + 1 / (x[1] ** 2)])
+        h_x += 1 / ((x[0] + x[1] - 1) ** 2)
+        return f_x, g_x, h_x
+    return f_x, g_x
+
+#
+# def qp_constrained_func(x: np.ndarray, eval_hessian: bool = False):
+#     # x=x0, y=x1, z=x2
+#     f_x = x[0] ** 2 + x[1] ** 2 + (x[2] + 1) ** 2
+#     g_x = np.array([2 * x[0],
+#                     2 * x[1],
+#                     2 * x[2] + 2])
+#     if eval_hessian:
+#         h_x = np.array([2, 0, 0,
+#                         0, 2, 0,
+#                         0, 0, 2])
+#         return f_x, g_x, h_x
+#     return f_x, g_x
+#
+#
+# def lp_constrained_func(x: np.ndarray, eval_hessian: bool = False):
+#     # x=x0, y=x1
+#     f_x = -x[0] - x[1]
+#     g_x = np.array([-1, -1])
+#     if eval_hessian:
+#         h_x = np.zeros((len(x), len(x)))
+#         return f_x, g_x, h_x
+#     return f_x, g_x
