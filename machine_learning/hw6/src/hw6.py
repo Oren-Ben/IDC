@@ -127,7 +127,7 @@ def initialize(X, k):
     
     centroids = []
     idx = X.shape[0]
-    rand_idx = np.random.choice(idx, 1, replace=False)
+    rand_idx = np.random.choice(idx)
     centroids.append(X[rand_idx,:])
 #     print(centroids)
     
