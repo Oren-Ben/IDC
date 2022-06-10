@@ -65,7 +65,7 @@ def kmeans(X, k, p ,max_iter=100):
     """
     classes = []
     centroids = get_random_centroids(X, k)
-    print(centroids)
+#     print(centroids)
     ###########################################################################
     # TODO: Implement the function.                                           #
     ###########################################################################
