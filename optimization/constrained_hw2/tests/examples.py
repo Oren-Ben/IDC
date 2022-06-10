@@ -15,7 +15,6 @@ def eq_constraints_rhs(eval_quad: bool = False):
         b = np.array([1])
     return b
 
-
 ###################### QP function: ###########################
 
 def qp_func(x: np.ndarray):  # , eval_quad: bool = False):

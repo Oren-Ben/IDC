@@ -1,7 +1,6 @@
 import unittest
 from src.utils import *
 
-
 class TestConstrained(unittest.TestCase):
     func_list = [qp_func, lp_func]
     titles_list = ['qp_func', 'lp_func']
